@@ -1,38 +1,56 @@
 import 'package:flutter/material.dart';
-// import 'package:shree_pro/constants/fonts.dart';
-import 'package:shree_pro/presentation/authentication/login/login_screen.dart';
-// import 'package:shree_pro/presentation/authentication/login/login_screen.dart';?
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'core/injection/injection_container.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
+import 'features/onboarding/presentation/pages/splash_screen.dart';
 
-void main() {
-  runApp( MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initDependencies();
+  
+  // Initialize SharedPreferences for theme
+  final prefs = await SharedPreferences.getInstance();
+  
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
-   const MyApp({super.key});
-    // int _currentIndex = 0;
+  final SharedPreferences prefs;
+  
+  const MyApp({super.key, required this.prefs});
 
-  // final List<Widget> _pages = [
-  //   DashboardPage(),
-  //   SearchPage(),
-  //   ProfilePage(),
-  // ];
-
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-
-        routes: {
-        "/login": (context) => const AuthApi(),
-        // "/home": (context) => const HomePage(),
-      },
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 248, 242, 242),
-        fontFamily: "Inter",
-         
+    return ChangeNotifierProvider(
+      create: (_) => ThemeProvider(prefs),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          // Show loading indicator while theme is loading
+          if (themeProvider.isLoading) {
+            return MaterialApp(
+              title: 'Shree Pro',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              home: const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
+          }
+          
+          return MaterialApp(
+            title: 'Shree Pro',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
+            home: const SplashScreen(),
+          );
+        },
       ),
-      home: AuthApi(),
     );
   }
 }
