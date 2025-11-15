@@ -9,7 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../core/services/api_endpoints.dart';
 import '../../../../core/utils/developer_logger.dart';
-import '../../../../presentation/pages/dashboard/stations/dashboard.dart';
+import '../../../../presentation/pages/dashboard/dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import 'forgot_password/forgot_password_page.dart';
 import 'biometric_check_page.dart';
@@ -199,8 +199,14 @@ class _LoginPageState extends State<LoginPage> {
                   }
                 }
               } else if (state is AuthTokenInvalid) {
-                log('❌ Token validation failed, showing login screen', tag: 'LoginPage', isError: true);
-                // Token is invalid, user needs to login again
+                log('❌ Token validation failed, clearing expired token and showing login screen', tag: 'LoginPage', isError: true);
+                // Token is invalid/expired, clear it from storage
+                try {
+                  await secureStorage.delete(key: ApiEndpoints.accessTokenKey);
+                  log('Expired token cleared from storage', tag: 'LoginPage');
+                } catch (e) {
+                  log('Error clearing expired token: $e', tag: 'LoginPage', isError: true);
+                }
                 // State is already set to show login screen
               } else if (state is AuthError) {
                 AppDialog.showError(

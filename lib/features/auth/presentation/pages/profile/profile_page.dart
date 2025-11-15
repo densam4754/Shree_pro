@@ -404,10 +404,10 @@ class _ProfilePageState extends State<ProfilePage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.grey800 : AppTheme.white,
+        color: isDark ? Colors.grey[850] : AppTheme.white,
         borderRadius: BorderRadius.circular(12),
         border: isDark
-            ? Border.all(color: AppTheme.grey700)
+            ? Border.all(color: const Color(0xFF595959))
             : Border.all(color: AppTheme.grey200),
       ),
       child: Row(

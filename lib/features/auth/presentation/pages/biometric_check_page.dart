@@ -3,7 +3,7 @@ import '../../../../core/components/network_check_widget.dart';
 import '../../../../core/services/biometric_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/developer_logger.dart';
-import '../../../../presentation/pages/dashboard/stations/dashboard.dart';
+import '../../../../presentation/pages/dashboard/dashboard.dart';
 import 'login_page.dart';
 
 /// Biometric Check Page

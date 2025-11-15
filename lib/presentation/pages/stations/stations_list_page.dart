@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/injection/injection_container.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/number_formatter.dart';
 import '../../../features/sales/domain/entities/sale_entity.dart';
 import '../../../features/sales/presentation/bloc/sales_bloc.dart';
 import 'station_details_page.dart';
@@ -156,14 +157,14 @@ class _StationsListPageState extends State<StationsListPage> {
     return BlocProvider.value(
       value: salesBloc,
       child: Scaffold(
-        backgroundColor: isDark ? AppTheme.grey900 : AppTheme.grey100,
+        backgroundColor: isDark ? Colors.grey[850] : AppTheme.grey100,
         body: SafeArea(
           child: BlocBuilder<SalesBloc, SalesState>(
             builder: (context, state) {
               final slivers = <Widget>[
 
                 SliverAppBar(
-                  backgroundColor: isDark ? AppTheme.grey900 : AppTheme.white,
+                  backgroundColor: isDark ? Colors.grey[850] : AppTheme.white,
                   surfaceTintColor: Colors.transparent,
                   elevation: 0,
                   pinned: false,
@@ -182,7 +183,7 @@ class _StationsListPageState extends State<StationsListPage> {
                 SliverToBoxAdapter(
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(16, 5, 16, 10),
-                    color: isDark ? AppTheme.grey900 : AppTheme.white,
+                    color: isDark ? Colors.grey[850] : AppTheme.white,
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
@@ -205,7 +206,7 @@ class _StationsListPageState extends State<StationsListPage> {
                               )
                             : null,
                         filled: true,
-                        fillColor: isDark ? AppTheme.grey800 : AppTheme.grey100,
+                        fillColor: isDark ? Colors.grey[850] : AppTheme.grey100,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -364,7 +365,7 @@ class _StationsListPageState extends State<StationsListPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.grey800 : AppTheme.white,
+        color: isDark ? Colors.grey[850] : AppTheme.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -476,13 +477,7 @@ class _StationsListPageState extends State<StationsListPage> {
   }
 
   String _formatCurrency(double amount) {
-    if (amount >= 1000000) {
-      return '\$${(amount / 1000000).toStringAsFixed(2)}M';
-    } else if (amount >= 1000) {
-      return '\$${(amount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '\$${amount.toStringAsFixed(0)}';
-    }
+    return NumberFormatter.formatCurrency(amount);
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../core/injection/injection_container.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/number_formatter.dart';
 import '../../../features/sales/domain/entities/sale_entity.dart';
 import '../../../features/sales/presentation/bloc/sales_bloc.dart';
 
@@ -1016,23 +1017,11 @@ class _StationDetailsPageState extends State<StationDetailsPage> {
   }
 
   String _formatCurrency(double amount) {
-    if (amount >= 1000000) {
-      return '\$${(amount / 1000000).toStringAsFixed(2)}M';
-    } else if (amount >= 1000) {
-      return '\$${(amount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '\$${amount.toStringAsFixed(0)}';
-    }
+    return NumberFormatter.formatCurrency(amount);
   }
 
   String _formatCurrencyCompact(double amount) {
-    if (amount >= 1000000) {
-      return '\$${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '\$${(amount / 1000).toStringAsFixed(0)}K';
-    } else {
-      return '\$${amount.toStringAsFixed(0)}';
-    }
+    return NumberFormatter.formatCurrencyCompact(amount);
   }
 }
 

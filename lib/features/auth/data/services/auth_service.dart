@@ -236,9 +236,9 @@ class AuthService {
       // Check network connection using NetworkChecker
       final isConnected = await NetworkChecker.checkConnection();
       if (!isConnected) {
-        log('AuthService.validateToken() - No network connection, assuming valid for offline usage', tag: 'AuthService');
-        // If no internet, assume token is valid to allow offline usage
-        return true;
+        log('AuthService.validateToken() - No network connection, cannot validate token', tag: 'AuthService');
+        // If no internet, we cannot validate the token, so return false to require login
+        return false;
       }
 
       // Network is available, proceed with API call to verify token
@@ -253,6 +253,14 @@ class AuthService {
           return false;
         }
 
+        // 404 means endpoint doesn't exist - this doesn't mean token is invalid
+        // We can't validate via this endpoint, but token might still be valid
+        if (response.statusCode == 404) {
+          log('AuthService.validateToken() - Validation endpoint not found (404). Assuming token is valid since endpoint may not exist.', tag: 'AuthService');
+          // Return true to allow auto-login - token will be validated on actual API usage
+          return true;
+        }
+
         // Any 2xx status code means token is valid
         if (response.statusCode >= 200 && response.statusCode < 300) {
           log('AuthService.validateToken() - Token validation passed', tag: 'AuthService', isSuccess: true);
@@ -263,15 +271,42 @@ class AuthService {
         log('AuthService.validateToken() - Token validation returned status: ${response.statusCode}', tag: 'AuthService');
         return false;
       } catch (e) {
-        log('AuthService.validateToken() - Network error: $e - assuming valid for offline usage', tag: 'AuthService');
-        // If network error, we can't validate, so assume token is valid
-        // This allows offline usage
-        return true;
+        // Check if this is a ServerException
+        if (e is ServerException) {
+          // 401 means token is definitely expired or invalid
+          if (e.statusCode == 401) {
+            log('AuthService.validateToken() - Token expired or invalid (401 ServerException)', tag: 'AuthService', isError: true);
+            return false;
+          }
+          
+          // 404 means endpoint doesn't exist - this doesn't mean token is invalid
+          // We can't validate via this endpoint, but token might still be valid
+          if (e.statusCode == 404) {
+            log('AuthService.validateToken() - Validation endpoint not found (404). Assuming token is valid since endpoint may not exist.', tag: 'AuthService');
+            // Return true to allow auto-login - token will be validated on actual API usage
+            return true;
+          }
+          
+          // Other server errors - can't validate, assume invalid to be safe
+          log('AuthService.validateToken() - Server error (${e.statusCode}): $e - cannot validate token', tag: 'AuthService', isError: true);
+          return false;
+        }
+        
+        // Check if this is a NetworkException (actual network error, not server error)
+        if (e is NetworkException) {
+          log('AuthService.validateToken() - Network error: $e - cannot validate token', tag: 'AuthService', isError: true);
+          // For actual network errors, we cannot validate, so return false to require login
+          return false;
+        }
+        
+        // For other exceptions, log and return false to be safe
+        log('AuthService.validateToken() - Unexpected error: $e - cannot validate token', tag: 'AuthService', isError: true);
+        return false;
       }
     } catch (e) {
-      log('AuthService.validateToken() - Error: $e', tag: 'AuthService', isError: true);
-      // On error, assume valid to allow offline usage
-      return true;
+      log('AuthService.validateToken() - Error: $e - cannot validate token', tag: 'AuthService', isError: true);
+      // On error, return false to require login
+      return false;
     }
   }
 

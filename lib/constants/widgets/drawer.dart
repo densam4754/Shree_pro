@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shree_pro/features/customers/presentation/pages/customers_page.dart';
-import 'package:shree_pro/presentation/pages/dashboard/stations/dashboard.dart';
+import 'package:shree_pro/presentation/pages/dashboard/dashboard.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:shree_pro/features/sales/presentation/pages/sales_page.dart';
 import 'package:shree_pro/features/purchases/presentation/pages/purchases_page.dart';
@@ -8,6 +9,8 @@ import 'package:shree_pro/features/suppliers/presentation/pages/supplier_page.da
 import 'package:shree_pro/features/taxpayers/presentation/pages/taxpayer_page.dart';
 import 'package:shree_pro/features/insurance/presentation/pages/insurance_page.dart';
 import 'package:shree_pro/core/theme/app_theme.dart';
+import 'package:shree_pro/core/injection/injection_container.dart';
+import 'package:shree_pro/presentation/pages/reports/reports_page.dart';
 
 class customDrawer extends StatelessWidget {
   const customDrawer({super.key});
@@ -131,7 +134,10 @@ class customDrawer extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CustomersPage(),
+                        builder: (_) => BlocProvider.value(
+                          value: salesBloc,
+                          child: const CustomersPage(),
+                        ),
                       ),
                     );
                   },
@@ -228,7 +234,15 @@ class customDrawer extends StatelessWidget {
                   isDark: isDark,
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: Navigate to Report
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider.value(
+                          value: salesBloc,
+                          child: const ReportsPage(),
+                        ),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -252,7 +266,7 @@ class customDrawer extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: isDark ? AppTheme.grey800 : AppTheme.grey100,
+        color: isDark ? Colors.grey[850] : AppTheme.grey100,
       ),
       child: ListTile(
         leading: Container(
